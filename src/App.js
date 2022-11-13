@@ -5,8 +5,16 @@ import Form from "./components/Form";
 import { nanoid } from "nanoid";
 import FilterButton from "./components/FilterButton";
 
+const FILTER_MAP = {
+  All: () => true,
+  Active: (task) => !task.completed,
+  Completed: (task) => task.completed
+};
+const FILTER_NAMES = Object.keys(FILTER_MAP);
 function App(props) {
   const [tasks, setTasks] = useState(props.tasks);
+  const [filter, setFilter] = useState("All");
+
   function addTask(task) {
     const newTask = { id: `todo-${nanoid()}`, name: task, completed: false };
     setTasks([...tasks, newTask]);
@@ -42,25 +50,32 @@ function App(props) {
     });
     setTasks(editedTaskList);
   }
-  const taskList = tasks?.map((task) => (
-    <Todo
-      key={task.id}
-      id={task.id}
-      name={task.name}
-      completed={task.completed}
-      toggleTaskCompleted={toggleTaskCompleted}
-      deleteTask={deleteTask}
-      editTask={editTask}
-    />
-  ));
+  const taskList = tasks
+    ?.filter(FILTER_MAP[filter])
+    .map((task) => (
+      <Todo
+        key={task.id}
+        id={task.id}
+        name={task.name}
+        completed={task.completed}
+        toggleTaskCompleted={toggleTaskCompleted}
+        deleteTask={deleteTask}
+        editTask={editTask}
+      />
+    ));
+  const filterList = FILTER_NAMES.map((name) => {
+    return <FilterButton key={name} name={name} setFilter={setFilter} />;
+  });
   const tasksNoun = taskList.length > 1 ? "tasks" : "task";
-  const headingText = `${taskList.length} ${tasksNoun} remaning`;
+  const tasksStatus = filter === "Completed" ? "completed" : "remaning";
+
+  const headingText = `${taskList.length} ${tasksNoun} ${tasksStatus}`;
 
   return (
     <div className="todoapp stack-large">
       <h1>TodoMatic</h1>
       <Form addTask={addTask} />
-      <FilterButton />
+      {filterList}
       <h2 id="list-heading">{headingText}</h2>
       <ul
         role="list"

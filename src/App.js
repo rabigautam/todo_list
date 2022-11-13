@@ -25,6 +25,11 @@ function App(props) {
     });
     setTasks(updatedTask);
   }
+
+  function deleteTask(id) {
+    const remaningTasks = tasks.filter((task) => id !== task.id);
+    setTasks(remaningTasks);
+  }
   const taskList = tasks?.map((task) => (
     <Todo
       key={task.id}
@@ -32,9 +37,10 @@ function App(props) {
       name={task.name}
       completed={task.completed}
       toggleTaskCompleted={toggleTaskCompleted}
+      deleteTask={deleteTask}
     />
   ));
-  const tasksNoun = taskList.length !== 1 ? "tasks" : "task";
+  const tasksNoun = taskList.length > 1 ? "tasks" : "task";
   const headingText = `${taskList.length} ${tasksNoun} remaning`;
 
   return (
